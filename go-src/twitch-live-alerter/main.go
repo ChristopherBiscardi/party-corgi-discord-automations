@@ -1,11 +1,44 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
+	"net/http"
+	"os"
+	"time"
+
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/honeycombio/libhoney-go"
 	"github.com/honeycombio/libhoney-go/transmission"
 )
+
+type DiscordWebhookPayload struct {
+	Content string `json:"content"`
+}
+
+func PostDiscordWebhook() (bool, error) {
+	discordURL, err := os.LookupEnv("DISCORD_WEBHOOK_URL")
+
+	if err == false {
+		panic("on no")
+	}
+
+	discordPayload := DiscordWebhookPayload{
+		Content: "Testing from netlify",
+	}
+	s, _ := json.Marshal(discordPayload)
+	b := bytes.NewBuffer(s)
+
+	var myClient = &http.Client{Timeout: 10 * time.Second}
+	r, postErr := myClient.Post(discordURL, "application/json", b)
+	if postErr != nil {
+		return false, postErr
+	}
+	defer r.Body.Close()
+
+	return true, nil
+}
 
 func handler(request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 	return &events.APIGatewayProxyResponse{
