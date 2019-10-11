@@ -80,10 +80,9 @@ func handler(request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResp
 	}
 	PostDiscordWebhook(DiscordWebhookPayload{
 		Content: fmt.Sprintf(
-			"%s started streaming \"%s\" at https://twitch.tv/%s",
+			"%[1]s started streaming \"%[2]s\" at https://twitch.tv/%[1]s",
 			twitchStreamChangeEvent.UserName,
 			twitchStreamChangeEvent.Title,
-			twitchStreamChangeEvent.UserName,
 		),
 	})
 
