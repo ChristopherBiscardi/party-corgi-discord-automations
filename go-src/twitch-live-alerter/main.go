@@ -58,6 +58,7 @@ func PostDiscordWebhook(discordPayload DiscordWebhookPayload) (bool, error) {
 }
 
 func ReceiveTwitchPayload(request *events.APIGatewayProxyRequest) (TwitchStreamChangeEvent, error) {
+	fmt.Println(request.Body)
 	twitchPayload := TwitchNotificationPayload{}
 	byteBody := []byte(request.Body)
 
