@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -57,14 +58,20 @@ func PostDiscordWebhook(discordPayload DiscordWebhookPayload) (bool, error) {
 }
 
 func ReceiveTwitchPayload(request *events.APIGatewayProxyRequest) (TwitchStreamChangeEvent, error) {
-	return TwitchStreamChangeEvent{
-		UserName: "chrisbiscardi",
-		Title:    "Not a real webhook",
-	}, nil
+	twitchPayload := TwitchNotificationPayload{}
+	byteBody := []byte(request.Body)
+
+	if err := json.Unmarshal(byteBody, &twitchPayload); err != nil {
+		return TwitchStreamChangeEvent{}, errors.New("JSON unmarshall failed")
+	}
+	if len(twitchPayload.Data) > 0 {
+		return twitchPayload.Data[0], nil
+	}
+	return TwitchStreamChangeEvent{}, errors.New("failed to decode a single twitch stream change event")
 }
 func handler(request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 
-	twitchPayload, err := ReceiveTwitchPayload(&request)
+	twitchStreamChangeEvent, err := ReceiveTwitchPayload(&request)
 	if err != nil {
 		return &events.APIGatewayProxyResponse{
 			StatusCode: 200,
@@ -72,7 +79,12 @@ func handler(request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResp
 		}, nil
 	}
 	PostDiscordWebhook(DiscordWebhookPayload{
-		Content: fmt.Sprintf("%s started streaming \"%s\" at https://twitch.tv/%s", twitchPayload.UserName, twitchPayload.Title, twitchPayload.UserName),
+		Content: fmt.Sprintf(
+			"%s started streaming \"%s\" at https://twitch.tv/%s",
+			twitchStreamChangeEvent.UserName,
+			twitchStreamChangeEvent.Title,
+			twitchStreamChangeEvent.UserName,
+		),
 	})
 
 	return &events.APIGatewayProxyResponse{
