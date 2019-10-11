@@ -21,18 +21,30 @@ type DiscordWebhookPayload struct {
 	Content string `json:"content"`
 }
 
-// TwitchNotificationPayload represents a webhook
-// payload from twitch, which are nested in a
-// `data` field
-type TwitchNotificationPayload struct {
-	Data []TwitchStreamChangeEvent `json:"data"`
+// ZapierTwitchNotificationPayload is the twitch content payload
+// from zapier
+type ZapierTwitchNotificationPayload struct {
+	UserID       string       `json:"user_id"`
+	Language     string       `json:"language"`
+	Title        string       `json:"title"`
+	EventType    string       `json:"type"`
+	StreamerInfo StreamerInfo `json:"streamer_info"`
+	ThumbnailURL string       `json:"thumbnail_url"`
+	GameID       string       `json:"game_id"`
+	StartedAt    string       `json:"started_at"`
+	UserName     string       `json:"user_name"`
+	ID           string       `json:"id"`
+	ViewerCount  string       `json:"viewer_count"`
 }
 
-// TwitchStreamChangeEvent is the payload in the array here:
-// https://dev.twitch.tv/docs/api/webhooks-reference/#topic-stream-changed
-type TwitchStreamChangeEvent struct {
-	UserName string `json:"user_name"`
-	Title    string `json:"title"`
+// StreamerInfo is the Twitch streamer_info field
+type StreamerInfo struct {
+	ViewCount       string `json:"view_count"`
+	OfflineImageURL string `json:"offline_image_url"`
+	Description     string `json:"description"`
+	ProfileImageURL string `json:"profile_image_url"`
+	StreamURL       string `json:"stream_url"`
+	Login           string `json:"login"`
 }
 
 // PostDiscordWebhook sends a webhook to discord
@@ -57,22 +69,18 @@ func PostDiscordWebhook(discordPayload DiscordWebhookPayload) (bool, error) {
 	return true, nil
 }
 
-func ReceiveTwitchPayload(request *events.APIGatewayProxyRequest) (TwitchStreamChangeEvent, error) {
-	fmt.Println(request.Body)
-	twitchPayload := TwitchNotificationPayload{}
+func ReceiveTwitchPayload(request *events.APIGatewayProxyRequest) (ZapierTwitchNotificationPayload, error) {
+	twitchPayload := ZapierTwitchNotificationPayload{}
 	byteBody := []byte(request.Body)
 
 	if err := json.Unmarshal(byteBody, &twitchPayload); err != nil {
-		return TwitchStreamChangeEvent{}, errors.New("JSON unmarshall failed")
+		return twitchPayload, errors.New("JSON unmarshall failed")
 	}
-	if len(twitchPayload.Data) > 0 {
-		return twitchPayload.Data[0], nil
-	}
-	return TwitchStreamChangeEvent{}, errors.New("failed to decode a single twitch stream change event")
+	return twitchPayload, nil
 }
 func handler(request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 
-	twitchStreamChangeEvent, err := ReceiveTwitchPayload(&request)
+	zapierPayload, err := ReceiveTwitchPayload(&request)
 	if err != nil {
 		return &events.APIGatewayProxyResponse{
 			StatusCode: 200,
@@ -81,9 +89,10 @@ func handler(request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResp
 	}
 	PostDiscordWebhook(DiscordWebhookPayload{
 		Content: fmt.Sprintf(
-			"%[1]s started streaming \"%[2]s\" at https://twitch.tv/%[1]s",
-			twitchStreamChangeEvent.UserName,
-			twitchStreamChangeEvent.Title,
+			"%s started streaming \"%s\" at %s",
+			zapierPayload.UserName,
+			zapierPayload.Title,
+			zapierPayload.StreamerInfo.StreamURL,
 		),
 	})
 
