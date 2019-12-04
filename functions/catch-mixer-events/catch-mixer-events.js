@@ -17,7 +17,7 @@ exports.handler = async (event, context) => {
       client.use(
         new Mixer.OAuthProvider(client, {
           // TODO for Chris: Add Mixer Client ID
-          clientId: ''
+          clientId: process.env.MIXER_CLIENT_ID
         })
       );
 
