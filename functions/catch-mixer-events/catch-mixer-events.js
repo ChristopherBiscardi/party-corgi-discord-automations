@@ -3,7 +3,7 @@ const Mixer = require('@mixer/client-node');
 const client = new Mixer.Client(new Mixer.DefaultRequestRunner());
 
 // TODO for Chris: Add webhook URL for Discord channel
-const WEBHOOK_URL = '';
+const WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
 
 exports.handler = async (event, context) => {
   try {
