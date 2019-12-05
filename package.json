@@ -1,0 +1,16 @@
+{
+  "name": "party-corgi-discord-automations",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Party Corgis",
+  "repository": "https://github.com/ChristopherBiscardi/party-corgi-discord-automations",
+  "license": "ISC",
+  "dependencies": {
+    "@mixer/client-node": "^3.5.0",
+    "node-fetch": "^2.6.0"
+  }
+}
