@@ -53,7 +53,7 @@ exports.handler = async (event, context) => {
     console.log('***** CURRENT SUBSCRIPTION IDS');
     console.log(currentSubscriptionIds);
 
-    // // 4. Get Mixer IDs from MD list based on URL
+    // 4. Get Mixer IDs from MD list based on URL
     const updatedSubscriptionIds = mixerUrls.map(async url => {
       // Parse username from URL
       const usernameRegex = new RegExp(/(\w+)$/gim);
