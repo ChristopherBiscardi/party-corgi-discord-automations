@@ -1,4 +1,3 @@
-// TODO Chris: Remove this imp;ort
 const fetch = require('node-fetch');
 
 const Mixer = require('@mixer/client-node');
