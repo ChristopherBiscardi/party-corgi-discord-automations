@@ -1,5 +1,4 @@
 // TODO Chris: Remove this imp;ort
-const AppSecrets = require('../../secrets');
 const fetch = require('node-fetch');
 
 const Mixer = require('@mixer/client-node');
