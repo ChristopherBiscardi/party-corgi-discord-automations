@@ -99,8 +99,8 @@ exports.handler = async (event, context) => {
             url: ``
           },
           headers: {
-            Authorization: `Secret ${AppSecrets.PARTY_CORGI_SECRET}`,
-            'Client-ID': AppSecrets.PARTY_CORGI_CLIENT_ID
+            Authorization: `Secret ${process.env.PARTY_CORGI_SECRET}`,
+            'Client-ID': process.env.PARTY_CORGI_CLIENT_ID
           }
         })
         .then(res => {
