@@ -5,9 +5,8 @@ const client = new Mixer.Client(new Mixer.DefaultRequestRunner());
 
 client.use(
   new Mixer.OAuthProvider(client, {
-    // TODO Chris: Swap these local variables with env variables
-    clientId: AppSecrets.PARTY_CORGI_CLIENT_ID,
-    secret: AppSecrets.PARTY_CORGI_SECRET
+    clientId: process.env.PARTY_CORGI_CLIENT_ID,
+    secret: process.env.PARTY_CORGI_SECRET
   })
 );
 
@@ -15,8 +14,7 @@ exports.handler = async (event, context) => {
   try {
     // 1. Fetch list from /fetch-mixer-names
     const streamerList = await fetch(
-      // TODO Chris: Swap this local variable with an env variable
-      `${AppSecrets.SITE_URL}/.netlify/functions/fetch-mixer-names`,
+      `${process.env.SITE_URL}/.netlify/functions/fetch-mixer-names`,
       {
         method: 'post'
       }
@@ -31,8 +29,7 @@ exports.handler = async (event, context) => {
     const currentSubscriptions = await client
       .request('GET', `/hooks`, {
         headers: {
-          // TODO Chris: Swap this local variable with an env variable
-          Authorization: `Secret ${AppSecrets.PARTY_CORGI_SECRET}`
+          Authorization: `Secret ${process.env.PARTY_CORGI_SECRET}`
         }
       })
       .then(res => {
@@ -102,7 +99,6 @@ exports.handler = async (event, context) => {
             url: ``
           },
           headers: {
-            // TODO Chris: Swap these local variables with env variables
             Authorization: `Secret ${AppSecrets.PARTY_CORGI_SECRET}`,
             'Client-ID': AppSecrets.PARTY_CORGI_CLIENT_ID
           }
